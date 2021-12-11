@@ -79,7 +79,9 @@ def calcSoln(arr):
 calcSoln(ex_arr)
 
 # pt2
-def checkIsBorder(x, y, arr, arrToPushTo):
+
+
+def checkIsBorder(x, y, arr):
     '''Checks one point. Returns true
     if point is a border, otherwise
     returns false and adds it to basin array'''
@@ -90,48 +92,72 @@ def checkIsBorder(x, y, arr, arrToPushTo):
     val = int(arr[y][x])
     if val == 9:
         return True
-    #otherwise it's not a border!
-    key = '%s_%s' % (str(x), str(y))
-    if key not in arrToPushTo:
-        arrToPushTo.append(key)
+    # otherwise it's not a border!
     return False
 
-def basinCheck(x_0, y_0, orig_arr, arr=[]):
-    arr_pointers = arr.copy()
-    print(arr_pointers)
-    if (arr_pointers == []):
-        key = '%s_%s' % (str(x_0), str(y_0))
-        arr_pointers.append(key)
-    for pointer in arr_pointers:
-        x , y = pointer.split("_")
-        x = int(x)
-        y = int(y)
-        toggleAllBorders = True
-        if not checkIsBorder(x+1, y, orig_arr, arr_pointers):
-            toggleAllBorders = False
-        if not checkIsBorder(x-1, y, orig_arr, arr_pointers):
-            toggleAllBorders = False
-        if not checkIsBorder(x, y + 1, orig_arr, arr_pointers):
-            toggleAllBorders = False
-        if not checkIsBorder(x, y - 1, orig_arr, arr_pointers):
-            toggleAllBorders = False
-        if toggleAllBorders == True:
-            ##they're all borders!
-            return len(arr_pointers)
-        else: # there's another element somewhere 
-            return basinCheck(x + 1, y, orig_arr, arr_pointers) + basinCheck(x - 1, y, orig_arr, arr_pointers) + basinCheck(x, y + 1, orig_arr, arr_pointers) + basinCheck(x, y - 1, orig_arr, arr_pointers)
+
+def basinCheck(x, y, orig_arr, alreadyChecked, basinSize=1):
+    newBasin = basinSize
+    checked = alreadyChecked.copy()
+    print(x, y, newBasin, checked)
+    x = int(x)
+    y = int(y)
 
 
+    if not checkIsBorder(x+1, y, orig_arr):
+        print('a')
+        key = '%s_%s' % (str(x + 1), str(y))
+        if key not in checked:
+            print('b')
+            newBasin += 1
+            checked.append('%s_%s' % (str(x + 1), str(y)))
+            return basinCheck(x + 1, y, orig_arr, checked, newBasin)
+    if not checkIsBorder(x-1, y, orig_arr):
+        print('c')
+        key = '%s_%s' % (str(x - 1), str(y))
+        if key not in checked:
+            print('d')        
+            newBasin += 1
+            checked.append('%s_%s' % (str(x - 1), str(y)))
+            return basinCheck(x - 1, y, orig_arr, checked, newBasin)
+    if not checkIsBorder(x, y + 1, orig_arr):
+        print('e')
+        key = '%s_%s' % (str(x), str(y + 1))
+        if key not in checked:
+            print('f')        
+            newBasin += 1
+            checked.append('%s_%s' % (str(x), str(y + 1)))
+            return basinCheck(x, y + 1, orig_arr, checked, newBasin)
+    if not checkIsBorder(x, y - 1, orig_arr):
+        print('g')
+        key = '%s_%s' % (str(x), str(y - 1))
+        if key not in checked:
+            print('h')        
+            newBasin += 1
+            checked.append('%s_%s' % (str(x), str(y - 1)))
+            return basinCheck(x, y - 1, orig_arr, checked, newBasin)
+    else:
+        print('i')
+        # they're all borders!
+        return newBasin
 
 
 def calcBasinSize(low_pt_dict, arr):
     print(low_pt_dict)
+    basins = []
     for location, low_pt in low_pt_dict.items():
         x_0, y_0 = location.split("_")
         print(x_0, y_0)
-        basinSize = basinCheck(x_0, y_0, arr, [])
+        basinSize = basinCheck(x_0, y_0, arr, [], 1)
         print(basinSize)
-        break
+        basins.append(basinSize)
+    print(basins)
+    total = 1
+    for i in range(0, len(basins)):
+        total = total * basins[i]
+    return total
+
+
 
 
 print(calcBasinSize(lowestDict, ex_arr))
