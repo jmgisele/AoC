@@ -1,61 +1,43 @@
+import numpy as np
+
 with open('data.txt', 'r') as data:
     linebyline = data.read().splitlines()
-displays_arr = []
-
-vertical_linebyline = ['']*len(linebyline[0])
-
-for i in range(0, len(linebyline)):
-    line = linebyline[i]
-    for j in range(0, len(line)):
-        vertical_linebyline[j] += line[j]
-
-with open('ex.txt', 'r') as data:
-    ex_arr = data.read().splitlines()
-vertical_ex = ['']*len(ex_arr[0])
-
-for i in range(0, len(ex_arr)):
-    line = ex_arr[i]
-    for j in range(0, len(line)):
-        vertical_ex[j] += line[j]
-
 
 # pt 1
 lowestDict = {}
-
-
-def checkOneEntry(horiz_arr, x, y):
+def checkOneEntry(arr, x, y):
     '''Checks one entry for if its 
     value is lower than the surrounding 
     lowest points. If it is, appends to 
     lowestDict with key as horizontal_vertical
-    starting at 0,0 at the top of the array.
-    '''
-    val = int(horiz_arr[y][x])
+    coord, starting at 0,0 at the top of the 
+    array.'''
+    val = int(arr[y][x])
     low_X = True
     low_Y = True
     isEndPointX = False
     isEndPointY = False
     if x == 0:
         isEndPointX = True
-        if (val >= int(horiz_arr[y][x+1])):
+        if (val >= int(arr[y][x+1])):
             low_X = False
-    if (x == len(horiz_arr[0]) - 1):
+    if (x == len(arr[0]) - 1):
         isEndPointX = True
-        if (val >= int(horiz_arr[y][x-1])):
+        if (val >= int(arr[y][x-1])):
             low_X = False
     if not isEndPointX:
-        if (val >= int(horiz_arr[y][x-1])) or (val >= int(horiz_arr[y][x+1])):
+        if (val >= int(arr[y][x-1])) or (val >= int(arr[y][x+1])):
             low_X = False
     if y == 0:
         isEndPointY = True
-        if (val >= int(horiz_arr[y+1][x])):
+        if (val >= int(arr[y+1][x])):
             low_Y = False
-    elif (y == len(horiz_arr) - 1):
+    elif (y == len(arr) - 1):
         isEndPointY = True
-        if (val >= int(horiz_arr[y-1][x])):
+        if (val >= int(arr[y-1][x])):
             low_Y = False
     if not isEndPointY:
-        if (val >= int(horiz_arr[y+1][x])) or (val >= int(horiz_arr[y-1][x])):
+        if (val >= int(arr[y+1][x])) or (val >= int(arr[y-1][x])):
             low_Y = False
     if low_X and low_Y:
         # it's a match!
@@ -73,94 +55,53 @@ def calcSoln(arr):
         risk = 1 + num
         sum += risk
     return sum
-
-
-# calcSoln(linebyline)
-calcSoln(ex_arr)
+print(calcSoln(linebyline))
 
 # pt2
+nines_arr = []
+for line in linebyline:
+    newline = '9' + line + '9'
+    nines_arr.append(newline)
+nines_arr.insert(0, str('9'*len(nines_arr[0])))
+nines_arr.append('9'*len(nines_arr[0]))
 
+def adjacentPoints(point, arr, checked):
+    x, y = point
+    adj = []
+    toCheck = [(x + 1, y), (x - 1, y), (x, y+1), (x, y-1)]
+    vals = [arr[y][x + 1], arr[y][x - 1], arr[y+1][x], arr[y-1][x]]
+    for i in range(0, len(toCheck)):
+        if vals[i] != '9' and toCheck[i] not in checked:
+            adj.append(toCheck[i])
+    return adj
 
-def checkIsBorder(x, y, arr):
-    '''Checks one point. Returns true
-    if point is a border, otherwise
-    returns false and adds it to basin array'''
-    if x >= len(arr[0]) or x < 0:
-        return True
-    if y >= len(arr) or y < 0:
-        return True
-    val = int(arr[y][x])
-    if val == 9:
-        return True
-    # otherwise it's not a border!
-    return False
-
-
-def basinCheck(x, y, orig_arr, alreadyChecked, basinSize=1):
-    newBasin = basinSize
-    checked = alreadyChecked.copy()
-    print(x, y, newBasin, checked)
-    x = int(x)
-    y = int(y)
-
-
-    if not checkIsBorder(x+1, y, orig_arr):
-        print('a')
-        key = '%s_%s' % (str(x + 1), str(y))
-        if key not in checked:
-            print('b')
-            newBasin += 1
-            checked.append('%s_%s' % (str(x + 1), str(y)))
-            return basinCheck(x + 1, y, orig_arr, checked, newBasin)
-    if not checkIsBorder(x-1, y, orig_arr):
-        print('c')
-        key = '%s_%s' % (str(x - 1), str(y))
-        if key not in checked:
-            print('d')        
-            newBasin += 1
-            checked.append('%s_%s' % (str(x - 1), str(y)))
-            return basinCheck(x - 1, y, orig_arr, checked, newBasin)
-    if not checkIsBorder(x, y + 1, orig_arr):
-        print('e')
-        key = '%s_%s' % (str(x), str(y + 1))
-        if key not in checked:
-            print('f')        
-            newBasin += 1
-            checked.append('%s_%s' % (str(x), str(y + 1)))
-            return basinCheck(x, y + 1, orig_arr, checked, newBasin)
-    if not checkIsBorder(x, y - 1, orig_arr):
-        print('g')
-        key = '%s_%s' % (str(x), str(y - 1))
-        if key not in checked:
-            print('h')        
-            newBasin += 1
-            checked.append('%s_%s' % (str(x), str(y - 1)))
-            return basinCheck(x, y - 1, orig_arr, checked, newBasin)
-    else:
-        print('i')
-        # they're all borders!
-        return newBasin
-
+def basinCheck(low_point, arr, checked=[], endpoints=[]):
+    if checked == []:
+        checked.append(low_point)
+        endpoints.append(low_point)
+    needToCheck = False
+    for point in endpoints:
+        new_points = adjacentPoints(point, arr, checked)
+        if len(new_points) != 0:
+            needToCheck = True #gotta check these points' children before returning
+            endpoints += new_points
+            checked += new_points
+            endpoints.remove(point)
+    if not needToCheck: #all points in checked are endpoints. return set
+        return checked
+    return basinCheck(low_point, arr, checked, endpoints)
 
 def calcBasinSize(low_pt_dict, arr):
-    print(low_pt_dict)
     basins = []
-    for location, low_pt in low_pt_dict.items():
+    for location in low_pt_dict.keys():
         x_0, y_0 = location.split("_")
-        print(x_0, y_0)
-        basinSize = basinCheck(x_0, y_0, arr, [], 1)
-        print(basinSize)
-        basins.append(basinSize)
-    print(basins)
-    total = 1
-    for i in range(0, len(basins)):
-        total = total * basins[i]
-    return total
+        point = (int(x_0) + 1, int(y_0) + 1) #making up for adding 9s
+        basins.append(basinCheck(point, arr, [],[]))
+    lengths = []
+    for basin in basins:
+        lengths.append(len(basin))
+    lengths.sort(reverse=True)
+    return lengths[0]*lengths[1]*lengths[2]
 
 
-
-
-print(calcBasinSize(lowestDict, ex_arr))
-
-
-# print(calcBasinSize(lowestDict, linebyline))
+print(calcBasinSize(lowestDict, nines_arr))
