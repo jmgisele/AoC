@@ -1,5 +1,3 @@
-import numpy as np
-
 with open('data.txt', 'r') as data:
     linebyline = data.read().splitlines()
 
