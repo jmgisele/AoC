@@ -1,15 +1,11 @@
-import sys
-
-with open('ex.txt', 'r') as data:
+with open('data.txt', 'r') as data:
     lines = data.read().splitlines()
 
 class Node(object):
-    def __init__(self, name, init_graph):
+    def __init__(self, name):
         self.name = name
-        self.init_graph = init_graph
+        self.connections = []
         self.type = self.construct_type()
-        self.paths = self.construct_paths()
-        self.isVisited = False
     
     def construct_type(self):
         if (any(l.isupper() for l in self.name)):  # big room
@@ -20,16 +16,6 @@ class Node(object):
             return 'end'
         else:  # small room
             return 'small'
-    
-    def construct_paths(self):
-        paths = []
-        for line in self.init_graph:
-            a, b = line.split('-')
-            if a == self.name and b not in paths:
-                paths.append(b)
-            if b == self.name and a not in paths:
-                paths.append(a)
-        return paths
 
 
 
@@ -37,9 +23,8 @@ class Graph(object):
     def __init__(self, init_graph):
         self.init_graph = init_graph
         self.nodes = self.construct_nodes()
-        self.start = self.getStart()
-        self.end = self.getEnd()
-        self.paths = []
+        self.start = self.get_start()
+        self.construct_graph()
 
     def construct_nodes(self):
         added = []
@@ -48,57 +33,59 @@ class Graph(object):
             a, b = line.split('-')
             if a not in added:
                 added.append(a)
-                nodes.append(Node(a, self.init_graph))
+                nodes.append(Node(a))
             if b not in added:
                 added.append(b)
-                nodes.append(Node(b, self.init_graph))
+                nodes.append(Node(b))
         return nodes
     
-    def getStart(self):
+    def construct_graph(self):
         for node in self.nodes:
-            if node.name == 'start':
-                return node
-            
-    def getEnd(self):
-        for node in self.nodes:        
-            if node.name == 'end':
-                return node
-    
-    def findAllPaths(self, currNode, currPath=None):
-        if currPath == None: #beginning of a path
-            print('111111111111')
-            currPath =  []
-        currPath.append(currNode)
-        if currNode.type != 'big':
-            print('222222222222')
-            currNode.isVisited = True
-        print("nodes in currPath: ")
-        for node in currPath:
-            print(node.name)
-        print("end of currPath nodes")
-        if currNode == self.end: #we're done with this path
-            print('here\'s a path: ')
-            for node in currPath:
-                print(node.name)
-            print('end of path')
-            for node in self.nodes:
-                node.isVisited = False
-            return [currPath]
-        paths = []
-        for node in self.nodes:
-            if node.name in currNode.paths: #child nodes
-                print('following node is in ' + str(currNode.name) + '\'s path:')
-                print(node.name)
-                if not node.isVisited:
-                    print('3333333333333333')
-                    newpaths = self.findAllPaths(node, currPath)
-                    for path in newpaths:
-                        paths.append(path)
-        return paths
+            for line in self.init_graph:
+                a, b = line.split('-')
+                if a == node.name and b not in node.connections:
+                    node.connections += [node2 for node2 in self.nodes if node2.name == b]
+                if b == node.name and a not in node.connections:
+                    node.connections += [node2 for node2 in self.nodes if node2.name == a]
 
-        
+
+    def get_start(self):
+        return [node for node in self.nodes if node.name == 'start'][0]
+
+    #pt1
+    def calc_paths1(self, node, visited):
+        fin = []
+        new_visit = visited + [node]
+        if node.name == 'end':
+            return [new_visit]
+        for n in node.connections:
+            if (n.type != 'start') and ((n not in visited) or (n.type == 'big')):
+                fin += self.calc_paths1(n, new_visit)
+        return fin
+
+    #pt2
+    def calc_paths2(self, node, visited):
+        fin = []
+        new_visit = visited + [node]
+        if node.name == 'end':
+            return [new_visit]
+        for n in node.connections:
+            if (n.type == 'big'):
+                fin += self.calc_paths2(n, new_visit)
+            if (n.type == 'small' or n.type == 'end'):
+                small_rooms = [room for room in new_visit if room.type == 'small']
+                repeat = any([True for room in small_rooms if small_rooms.count(room) > 1])
+                if (repeat and new_visit.count(n) < 1) or (not repeat and new_visit.count(n) < 2):
+                    fin += self.calc_paths2(n, new_visit)
+        return fin
+
 
 ex = Graph(lines)
-print(ex.findAllPaths(ex.start))
+#pt1
+print(len(ex.calc_paths1(ex.start, [])))
+#pt2
+print(len(ex.calc_paths2(ex.start, [])))
 
-print(len(ex.findAllPaths(ex.start)))
+
+
+
