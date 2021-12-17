@@ -1,5 +1,4 @@
 #785
-import numpy as np
 import matplotlib.pyplot as plt
 
 with open('data.txt', 'r') as data:
