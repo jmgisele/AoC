@@ -84,34 +84,29 @@ class Graph(object):
 graph_one = Graph(lines)
 print(graph_one.dijkstra_pq())
 
-def generate_full_cave_map(lines):
-    cave = [[int(a) for a in line] for line in lines]
-    original_width = len(cave[0])
-    original_height = len(cave)
-
-    # for row in range(5):
+def generate_full_map(lines):
+    map_ints = [[int(a) for a in line] for line in lines]
+    original_width = len(map_ints[0])
+    original_height = len(map_ints)
 
     for row in range(5):
-        for row_idx in range(original_height):
+        for row_new in range(original_height):
             for col in range(5): 
                 if row == 0 and col == 0: 
                     continue 
-                for col_idx in range(original_width):
-                    original_value = int(cave[row_idx][col_idx])
+                for col_new in range(original_width):
+                    original_value = int(map_ints[row_new][col_new])
                     new_value = original_value + (col + row)
                     while new_value > 9: 
-                        new_value -= 9
-                    
-                    # Add the new value to the cave 
-                    cave[row_idx + row * original_height].append(new_value) 
+                        new_value -= 9                    
+                    map_ints[row_new + row * original_height].append(new_value) 
 
-        # Starting a new segment, append original height 
         if row != 4:
-            for _ in range(original_height):
-                cave.append([])
-    return [''.join(line) for line in [[str(a) for a in line] for line in cave]]
+            for row in range(original_height):
+                map_ints.append([])
+    return [''.join(line) for line in [[str(a) for a in line] for line in map_ints]]
 
 #pt2
-graph_two = Graph(generate_full_cave_map(lines))
+graph_two = Graph(generate_full_map(lines))
 print(graph_two.dijkstra_pq())
 
