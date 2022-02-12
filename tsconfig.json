@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+        "module": "ES2015",
+        "lib": ["es6"],
+        "types": ["node"],
+        "strict": true,
+        "preserveConstEnums": true,
+        "sourceMap": true
+    },
+    "exclude": [
+        "node_modules"
+    ]
+}

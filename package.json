@@ -1,0 +1,26 @@
+{
+  "name": "aoc",
+  "version": "1.0.0",
+  "description": "Advent of Code website [here](https://adventofcode.com/). I'm intending on just getting as far as I can since this is year one for me. Solns in Python and JS.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jmgisele/AoC.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jmgisele/AoC/issues"
+  },
+  "homepage": "https://github.com/jmgisele/AoC#readme",
+  "dependencies": {
+    "typescript": "^4.5.5"
+  },
+  "devDependencies": {
+    "@types/node": "^17.0.17"
+  }
+}
