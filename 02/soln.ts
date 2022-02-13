@@ -7,6 +7,7 @@ const result = data.split(/\r?\n/).map((a: string) => {
     const ans = [arr[0], parseInt(arr[1])]
     return ans;
 });
+
 interface Position {
     horizontal: number
     vertical: number
@@ -33,7 +34,7 @@ console.log(coords.horizontal * coords.vertical);
 
 //pt 2
 let aim = 0;
-const newCoords: Position =  { horizontal: 0, vertical: 0 };
+const newCoords: Position = { horizontal: 0, vertical: 0 };
 
 for (let entry of result) {
     switch (entry[0]) {
